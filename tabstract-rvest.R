@@ -5,20 +5,22 @@ library(plyr)
 library(dplyr)
 options(digits = 4)
 
-tennis.html <- read_html("javascript-scraping/career-federer.html")
+# Sys.time()
+# readLines("data-scraping/test-djokovic.txt") %>% 
+#   writeLines("data-scraping/scrape-career-serve.js")
+# system("./phantomjs data-scraping/scrape-career-serve.js")
+# Sys.time()
+
+tennis.html <- read_html("data-scraping/career-serve-data.html")
+links <- tennis.html %>% html_nodes("a") %>% html_attr("href")
 table_values <- tennis.html %>% html_nodes("#matches td") %>% html_text
+
 f <- function(n) {
   v <- table_values[(17*n+1):(17*n+17)]
   c(str_replace_all(str_replace_all(v[1], "[^[:alnum:]]", ""), "ÃÂÂ",  ""),
     str_replace_all(v[7], "[Â, ]", ""), v[2:6], v[8], v[10:17])
 }
 table_values[171:187]; f(10)
-
-# Sys.time()
-# system("./phantomjs javascript-scraping/scrape-career-federer.js")
-# Sys.time()
-# system("./phantomjs javascript-scraping/scrape-h2h-djo.js")
-# Sys.time()
 
 # stext <- read_html("javascript-scraping/career-federer.html") %>% 
 #   html_nodes(".stats") %>% html_text()
