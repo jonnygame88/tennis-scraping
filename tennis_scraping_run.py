@@ -5,7 +5,7 @@ pd.set_option("display.max_rows", 250)
 
 data_path = 'C:\\Projects\\tennis-modelling\\data\\player-csvs\\'
 opponent_ids = pd.read_csv(data_path + 'opponent-ids-atp.csv').opponent_id
-start_loc, end_loc = 31, 40
+start_loc, end_loc = 51, 60
 gender, yr1, yr2 = 'm', 2006, 2016
 errors = []
 
