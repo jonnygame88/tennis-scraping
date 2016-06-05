@@ -22,4 +22,4 @@ for i in list(range(start_loc, end_loc+1)):
             errors.append(player_name)
             pass
 
-print(str(len(errors))+ ' error(s): ', errors)
+print(str(len(errors)) + ' error(s): ', errors)
