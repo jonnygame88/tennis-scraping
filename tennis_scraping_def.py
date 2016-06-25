@@ -73,6 +73,19 @@ def player_ref_data(player_id, gender, yr_start, yr_end):
                           match_urls[i], event_urls[i]]
     return(player_df)
 
+## get tournament info
+def event_summary(event_url):
+    event_fields = ['Date:', 'Rank:', 'Court type:', 'Prize money:']
+    base_url = 'http://www.tennisbetsite.com/tournaments/' 
+    event_soup = soup(base_url + event_url + '.html')
+    event_info = event_soup.findAll('td', {'class': 'tour-info'})
+    info_rows = event_info[0].findAll('tr')
+    fields = [r.findAll('td', {'class': 'field'})[0] for r in info_rows]
+    fields = [f.text for f in fields]
+    f_index = [i for i in range(len(fields)) if fields[i] in event_fields]
+    values = [r.findAll('td', {'class': 'value'})[0] for r in info_rows]
+    return([values[i].text for i in f_index])
+
 ## get match info from match soup
 def match_info(match_soup):
     tourn = match_soup.h2.get_text()
@@ -94,35 +107,24 @@ def match_stats(match_soup):
     else:
         return([x.get_text() for x in gs.findAll(attrs = {'class': 'value'})])
 
+## get match data
+def match_summary(match_url):
+    base_url = 'http://www.tennisbetsite.com/index.php?option=com_mvx_trdb&'
+    m_soup = soup(base_url + match_url)
+    output = [match_info(m_soup) + match_stats(m_soup)][0]
+    if len(output) == 41: return(output)
+    else: return(output[:13] + 28*[''])
+
 ## generate empty data frame
 def get_stats_df():
     return(pd.DataFrame(columns = 
-    ['m_no', 'daymonth', 'tournament', 'surface', 'round', 
+    ['daymonth', 'tournament', 'surface', 'round', 
      'player1', 'nat1', 'player2', 'nat2', 'set1', 'set2', 'set3', 'set4', 'set5',
      'p1_s1perc', 'p2_s1perc', 'p1_aces', 'p2_aces', 'p1_dfs', 'p2_dfs',
      'p1_ues', 'p2_ues', 'p1_s1win', 'p2_s1win', 'p1_s2win', 'p2_s2win',
      'p1_winners', 'p2_winners', 'p1_rwin', 'p2_rwin', 'p1_bpconv', 'p2_bpconv',
      'p1_nas', 'p2_nas', 'p1_tpwin', 'p2_tpwin', 'p1_smax', 'p2_smax',
      'p1_s1avg', 'p2_s1avg', 'p1_s2avg', 'p2_s2avg']))
-    
-## get player match history
-def player_history(player_id, gender, yr_start, yr_end):
-    stats_df = get_stats_df()
-    ref_table = player_ref_data(player_id, gender, yr_start, yr_end)
-    match_urls = ref_table.match_url
-    n = len(match_urls)
-    for i in range(n):
-        print(str(i) + ' / ' + str(n))
-        if match_urls[i] != '': 
-            m_soup = soup(match_urls[i])
-            output = [['m' + str(i)] + match_info(m_soup) + match_stats(m_soup)][0]
-        else: 
-            output = ['m' + str(i)] + 13*['']
-        if len(output) == 42: 
-            stats_df.loc[i] = output
-        else: 
-            stats_df.loc[i] = output[:14] + 28*['']
-    return(pd.merge(ref_table, stats_df, on = 'm_no'))
 
 ## get player name from player id
 def get_name(player_id, gender):
