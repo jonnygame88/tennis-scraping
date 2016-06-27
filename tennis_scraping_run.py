@@ -28,7 +28,7 @@ def create_match_csv(a, b):
         err1 = err0.append(errors)
         err1.to_csv(data_path + 'errors.csv', index = False)
 
-for n in range(13):
+for n in range(14):
     create_match_csv(1000*n, 1000*(n+1)-1)
 
 '''
